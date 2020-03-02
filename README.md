@@ -1,1 +1,1 @@
-# Vulneability-Prediction-Using-RCLUV
+# Vulnerability-Prediction-Using-RCLUV
