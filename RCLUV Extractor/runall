@@ -1,0 +1,29 @@
+#!/bin/bash
+ulimit -s hard
+
+# Get the system directory name
+if [ ! -d "$1" ] 
+then
+    echo "Usage:  runall DIRNAME"
+    exit 99
+else
+    echo "Making RCLUV spreadsheet for $1"
+fi
+
+# Print out column titles
+txl -q -s 1000 dummy.c rcluv-c.txl -d SPREADSHEET -d TITLES 2> "$1".csv
+
+# Now print a row for each Java file in the given directory tree
+IFS=$'\n'
+for i in `find "$1" | grep '\.c$'`
+do
+    echo -n "."
+    (txl -q -s 1000 "${i}" ifdef.txl > "${i}".ifdefed) > /tmp/$$.tmp
+    (txl -q -s 1000 "${i}".ifdefed rcluv-c.txl -d SPREADSHEET 2>&1) >> /tmp/$$.tmp
+    grep -v "TXL0" /tmp/$$.tmp >> "$1".csv
+    # grep "TXL0" /tmp/$$.tmp 
+done
+
+/bin/rm -f /tmp/$$.tmp
+echo ""
+echo "Done - output in $1.csv"
